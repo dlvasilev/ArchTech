@@ -1,0 +1,179 @@
+<section data-ng-controller="StorageController" data-ng-init="init()">
+    <ul class="breadcrumb">
+        <li><a href="">{{ authentication.user.username }}</a></li>
+        <li ng-repeat="file in path"><a href="">{{ file.name }}</a></li>
+    </ul>
+    <div class="col-md-3" data-ng-init="getStatistics()">
+        <div class="panel panel-primary storage-statistics">
+            <div class="panel-heading">
+                <h3 class="panel-title">Статистика</h3>
+            </div>
+            <div class="panel-body">
+                <h5>Пространство</h5>
+                <h6>
+                    <span ng-switch="statistics.storage > 1024*1024">
+                        <span ng-switch-when="true">{{statistics.storage / 1024 / 1024 | number:2}} MB</span>
+                        <span ng-switch-default>{{statistics.storage / 1024 | number:2}} kB</span>
+                    </span>
+                     \
+                    <span ng-switch="statistics.maxStorage > 1024*1024">
+                        <span ng-switch-when="true">{{statistics.maxStorage / 1024 / 1024 | number:2}} MB</span>
+                        <span ng-switch-default>{{statistics.maxStorage / 1024 | number:2}} kB</span>
+                    </span>
+                </h6>
+                <div class="progress">
+                    <div class="progress-bar progress-bar-warning" style="width: 1%"></div>
+                </div>
+                <h5>Файлове</h5>
+                <h6>{{ statistics.files }} \ {{ statistics.maxFiles }}</h6>
+                <div class="progress">
+                    <div class="progress-bar progress-bar-info" style="width: 1%"></div>
+                </div>
+                <h5>Папки</h5>
+                <h6>{{ statistics.folders }} \ {{ statistics.maxFolders }}</h6>
+                <div class="progress">
+                    <div class="progress-bar progress-bar-success" style="width: 1%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div class="row">
+            <div class="navbar navbar-default">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-inverse-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="navbar-collapse collapse navbar-inverse-collapse">
+                    <ul class="nav navbar-nav">
+                        <li>
+                            <a href="" class="dropdown-toggle" data-toggle="dropdown">Добави <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="" id="upload-file-link" data-toggle="modal" data-target="#upload-file-modal">Файл</a></li>
+                                <li><a href="" id="create-folder-link" data-toggle="modal" data-target="#create-folder-modal">Папка</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="" ng-click="open()">Отвори</a>
+                        </li>
+                        <li>
+                            <a href="" ng-click="download()">Изтегли</a>
+                        </li>
+                        <li>
+                            <a href="" ng-click="delete()">Изтрий</a>
+                        </li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="" class="dropdown-toggle" data-toggle="dropdown">Групирай <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="" ng-click="sortFilesBy = 'type'">Нормално</a></li>
+                                <li><a href="" ng-click="sortFilesBy = 'name'">Име</a></li>
+                                <li><a href="" ng-click="sortFilesBy = '-fileType'">Тип</a></li>
+                                <li><a href="" ng-click="sortFilesBy = 'data'">Дата</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="storage-explorer">
+                <div class="storage-explorer-head">
+                    <div class="storage-explorer-col col-name">Име</div>
+                    <div class="storage-explorer-col col-type">Тип</div>
+                    <div class="storage-explorer-col col-size">Размер</div>
+                    <div class="storage-explorer-col col-data">Дата</div>
+                </div>
+                <div class="storage-explorer-body">
+                    <div class="storage-explorer-row" ng-click="back()" data-ng-hide="path.length === 0">
+                        <div class="storage-explorer-col col-name">...</div>
+                    </div>
+                    <div class="storage-explorer-row" data-ng-repeat="file in storage | orderBy: sortFilesBy" ng-click="changeSelected()" ng-dblclick="open()" ng-class="{active: '{{ file._id }}' == selected }" id="storage-file-{{ file._id }}" data-name="{{ file.name }}" data-type="{{ file.type }}">
+                        <div class="storage-explorer-col col-name">{{ file.name }}</div>
+                        <div class="storage-explorer-col col-type">{{ file.fileType }}</div>
+                        <div class="storage-explorer-col col-size">
+                            <span ng-switch="file.size > 1024*1024" ng-if="file.type != 1">
+                                <span ng-switch-when="true">{{file.size / 1024 / 1024 | number:2}} MB</span>
+                                <span ng-switch-default>{{file.size / 1024 | number:2}} kB</span>
+                            </span>
+                        </div>
+                        <div class="storage-explorer-col col-data">{{ file.created | date: 'dd.MM.yyyy' }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="alert alert-warning text-center" style="margin-top: 20px;" data-ng-hide="!storage || storage.length">
+                Няма файлове в тази папка.
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Storage Functions -->
+
+    <!-- Create Folder -->
+    <div class="modal" id="create-folder-modal" role="dialog" aria-labelledby="Create Folder" aria-describedby="Creating new Folder" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form data-ng-submit="create()">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h4 class="modal-title">Нова папка</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="folderName">Име</label>
+                            <input type="text" class="form-control" id="folderName" data-ng-model="folderName" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Отказ</button>
+                        <input type="submit" class="btn btn-primary" value="Създай">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload File -->
+    <div class="modal" id="upload-file-modal" role="dialog" aria-labelledby="Add File" aria-describedby="Uploading File" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form enctype="multipart/form-data">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h4 class="modal-title">Качване на файл</h4>
+                    </div>
+                    <div id="dropbox" class="modal-body">
+                        <div class="alert alert-dismissable alert-warning">
+                            <div ng-class="dropClass" style="color: #FFF !important;">
+                                <input type="file" ng-model-instant id="fileToUpload" name="uploadFile" multiple onchange="angular.element(this).scope().fileUpload.setFiles(this)" /><br />
+                                <span>{{fileUpload.dropText}}</span>
+                            </div>
+                            <div ng-show="fileUpload.files.length">
+                                <div ng-repeat="file in fileUpload.files">
+                                    <span>{{file.webkitRelativePath ||file.name}}</span>
+                                    (<span ng-switch="file.size > 1024*1024">
+                                        <span ng-switch-when="true">{{file.size / 1024 / 1024 | number:2}} MB</span>
+                                        <span ng-switch-default>{{file.size / 1024 | number:2}} kB</span>
+                                    </span>)
+                                </div>
+                                <div ng-show="fileUpload.progressVisible">
+                                    <div class="percent">{{fileUpload.progress}}%</div>
+                                    <div class="progress progress-striped active">
+                                        <div class="progress-bar" ng-style="{'width': fileUpload.progress+'%'}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Отказ</button>
+                        <input type="submit" class="btn btn-primary" ng-click="fileUpload.uploadFile()" value="Качи">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

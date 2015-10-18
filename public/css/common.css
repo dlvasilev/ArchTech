@@ -1,0 +1,288 @@
+.content {
+	margin-top: 50px;
+}
+a.undecorated-link:hover {
+	text-decoration: none;
+}
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+	display: none !important;
+}
+
+.breadcrumb a {
+    color: #333;
+}
+
+.table tr.primary, .primary {
+    background: #df691a;
+    color: #FFF;
+}
+
+#storage-options button{
+    margin-right: 10px;
+}
+.storage-explorer-head {
+    background: rgba(0,0,0,0.1);
+    padding: 0 7px;
+    font-weight: bold;
+    height: 30px;
+    line-height: 30px;
+}
+.storage-explorer-col {
+    display: inline-block;
+    font-size: 12px;
+}
+.storage-explorer-row {
+    height: 30px;
+    line-height: 30px;
+    padding: 0 7px;
+    border-bottom: 1px solid #CCC;
+    cursor: pointer;
+}
+.storage-explorer-row:hover, .storage-explorer-row.active {
+    background: #4e5d6c;
+    color: #FFF;
+}
+.col-name {
+    width: 57%;
+}
+.col-type {
+    width: 14.5%;
+}
+.col-size {
+    width: 13.5%;
+}
+.col-data {
+    width: 13%;
+}
+.storage-statistics {
+    margin-left: -15px;
+}
+@media screen and (max-width: 991px){
+    .storage-statistics {
+        margin-left: auto;
+    }
+}
+@media screen and (max-width: 665px){
+    .storage-explorer-head, .storage-explorer-row {
+        height: auto;
+        line-height: 25px;
+    }
+    .col-name, .col-type, .col-size, .col-data {
+        display: block;
+    }
+}
+
+.delete-member, .add-member {
+    display: none;
+}
+.member-row:hover .deleteMember, .addMember{
+    display: block;
+}
+.member-row:hover .admin {
+    display: none !important;
+}
+.member-row:hover .self {
+    display: block;
+}
+
+.empty-section {
+    margin-top: 10px;
+}
+
+#editor-wrapper {
+    margin-top:-10px;
+}
+
+.project-heading {
+    padding-bottom: 70px;
+}
+
+.head-menu i{
+    padding-right: 10px;
+}
+.editor-project span {
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+.app-intro {
+    margin-top: -10px;
+    padding: 4em 0 2em;
+    background-color: #1c2533;
+    background: -webkit-linear-gradient(70deg, #080f1f 30%, #2b4b5a 87%, #435e67 100%);
+    background: -o-linear-gradient(70deg, #080f1f 30%, #2b4b5a 87%, #435e67 100%);
+    background: -ms-linear-gradient(70deg, #080f1f 30%, #2b4b5a 87%, #435e67 100%);
+    background: -moz-linear-gradient(70deg, #080f1f 30%, #2b4b5a 87%, #435e67 100%);
+    background: linear-gradient(20deg, #080f1f 30%, #2b4b5a 87%, #435e67 100%);
+    background-attachment: fixed;
+    color: #fff;
+    text-align: center;
+    padding-bottom: 70px;
+}
+.app-intro h1 {
+    font-size: 4em;
+}
+.app-info {
+    padding: 4em 0 3em;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    background-color: #eaf1f1;
+}
+.app-info i {
+    margin-right: 20px;
+}
+.app-footer {
+    margin-top: 100px;
+    padding-bottom: 50px;
+}
+.project-header {
+    margin-bottom: 20px;
+}
+.editor-menu {
+    position: fixed;
+    top: 40px;
+    left: 0px;
+    bottom: 0px;
+    background-color: #1c2533;
+    background: -webkit-linear-gradient(70deg, #080f1f 30%, #2b4b5a 87%, #435e67 100%);
+    background: -o-linear-gradient(70deg, #080f1f 30%, #2b4b5a 87%, #435e67 100%);
+    background: -ms-linear-gradient(70deg, #080f1f 30%, #2b4b5a 87%, #435e67 100%);
+    background: -moz-linear-gradient(70deg, #080f1f 30%, #2b4b5a 87%, #435e67 100%);
+    background: linear-gradient(20deg, #080f1f 30%, #2b4b5a 87%, #435e67 100%);
+    background-attachment: fixed;
+    color: #FFF;
+    width: 50px;
+}
+.editor-menu section {
+    position: relative;
+}
+.editor-menu > section > span {
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    display: block;
+    font-size: 1.5em;
+}
+.editor-menu > section:first-child {
+    margin-top: 30px;
+}
+#editor-menu-draw {
+    position: fixed;
+    left: 50px;
+    top:50px;
+    background-color: #1c2533;
+    z-index: 10;
+}
+.editor-menu-context{
+    position: absolute;
+    top: 0%;
+    left: 100%;
+    z-index: 1000;
+    display: none;
+    float: left;
+    min-width: 160px;
+    padding: 10px;
+    margin: 2px 0 0;
+    list-style: none;
+    font-size: 15px;
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    background-clip: padding-box;
+    color: #333;
+    max-height: 500px;
+    overflow: auto;
+    overflow-x: hidden; 
+}
+.editor-chat{
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: 1000;
+    display: none;
+    width: 300px;
+    padding: 10px;
+    margin: 2px 0 0;
+    list-style: none;
+    font-size: 15px;
+    background-color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    background-clip: padding-box;
+    color: #333;
+    height: 300px;
+    overflow: hidden; 
+}
+#editor-page-chat-messages {
+    height: calc(100% - 30px);
+    overflow-y: auto;
+    overflow-x: none; 
+    margin-bottom: 5px;
+}
+#message-input {
+    height: 30px;
+    width: 205px;
+    resize: none;
+    display: inline-block;
+}
+.btn-send-msg {
+    height: 30px;
+    line-height: 15px;
+}
+
+.btn-editor {
+    background: none;
+    border-radius: none;
+    border: none;
+    display: block;
+    border-bottom: 1px solid #CCC;
+    width: 100%;
+    font-weight: bold;
+    height: 30px;
+    line-height: 25px;
+}
+
+#drawing-mode {
+    margin-top: -30px;
+}
+
+.editor-file {
+    width: 169px;
+    height: 169px;
+    border: 1px solid #1a242f;
+    background: #2c3e50;
+    display: inline-block;
+    margin:5px;
+    vertical-align: top;
+    position: relative;
+}
+.editor-file:hover {
+    background-color: #1a242f;
+}
+
+.editor-file a {
+    color: #FFF;
+    margin: 7px;
+    display: block;
+}
+.editor-file a:hover {
+    text-decoration: none;
+}
+
+.editor-file span {
+    color: #FFF;
+    position: absolute;
+    bottom:7px;
+    right: 7px;
+}
+
+.close-file {
+    display: inline-block;
+    margin-left:20px;
+    cursor: pointer;
+}

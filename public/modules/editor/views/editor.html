@@ -1,0 +1,487 @@
+<div class="row">
+    <section data-ng-controller="EditorController" data-ng-init="init()" id="editor-wrapper">
+        <div id="bd-wrapper" ng-controller="CanvasControls" class="ng-scope" data-ng-init="initEditor( file )">
+            <div id="canvas-wrapper">
+                <div class="canvas-container" style="position: relative; -webkit-user-select: none;">
+                    <canvas id="canvas" class="lower-canvas" style="position: absolute; left: 0px; top: 0px; -webkit-user-select: none;"></canvas>
+                </div>
+            </div>
+
+            <script>
+                var canvas = new fabric.Canvas('canvas', {
+                    backgroundColor: 'rgb(230,230,230)',
+                    width: $(document).width(),
+                    height: $(document).height() - 40
+                });
+
+                // var canvasScale = 1;
+                // var SCALE_FACTOR = 1.2;
+
+                // $('.upper-canvas').on('mousewheel', function (event) {
+                //     if (event.deltaY * event.deltaFactor > 0) {
+                //         zoomIn();
+                //     } else {
+                //         zoomOut();
+                //     }
+                // });
+
+                // // Zoom In
+                // function zoomIn() {
+
+                //     canvasScale = canvasScale * SCALE_FACTOR;
+
+                //     var objects = canvas.getObjects();
+                //     for (var i in objects) {
+                //         var scaleX = objects[i].scaleX;
+                //         var scaleY = objects[i].scaleY;
+                //         var left = objects[i].left;
+                //         var top = objects[i].top;
+
+                //         var tempScaleX = scaleX * SCALE_FACTOR;
+                //         var tempScaleY = scaleY * SCALE_FACTOR;
+                //         var tempLeft = left * (1 * SCALE_FACTOR);
+                //         var tempTop = top * (1 * SCALE_FACTOR);
+
+                //         objects[i].scaleX = tempScaleX;
+                //         objects[i].scaleY = tempScaleY;
+                //         objects[i].left = tempLeft;
+                //         objects[i].top = tempTop;
+
+                //         objects[i].setCoords();
+                //     }
+
+                //     canvas.renderAll();
+                // };
+
+                // // Zoom Out
+                // function zoomOut() {
+
+                //     canvasScale = canvasScale / SCALE_FACTOR;
+
+                //     var objects = canvas.getObjects();
+                //     for (var i in objects) {
+                //         var scaleX = objects[i].scaleX;
+                //         var scaleY = objects[i].scaleY;
+                //         var left = objects[i].left;
+                //         var top = objects[i].top;
+
+                //         var tempScaleX = scaleX * (1 / SCALE_FACTOR);
+                //         var tempScaleY = scaleY * (1 / SCALE_FACTOR);
+                //         var tempLeft = left * (1 / SCALE_FACTOR);
+                //         var tempTop = top * (1 / SCALE_FACTOR);
+
+                //         objects[i].scaleX = tempScaleX;
+                //         objects[i].scaleY = tempScaleY;
+                //         objects[i].left = tempLeft;
+                //         objects[i].top = tempTop;
+
+                //         objects[i].setCoords();
+                //     }
+
+                //     canvas.renderAll();
+                // };
+
+                $(window).resize(function () {
+                    canvas.setWidth($(document).width());
+                    canvas.setHeight($(document).height() - 40);
+                });
+
+                (function(){
+                    var mainScriptEl = document.getElementById('main');
+                    if (!mainScriptEl) return;
+                    var preEl = document.createElement('pre');
+                    var codeEl = document.createElement('code');
+                    codeEl.innerHTML = mainScriptEl.innerHTML;
+                    codeEl.className = 'language-javascript';
+                    preEl.appendChild(codeEl);
+                    document.getElementById('bd-wrapper').appendChild(preEl);
+
+                    fabric.util.addListener(fabric.window, 'load', function() {
+                        var canvas = this.__canvas || this.canvas,
+                                canvases = this.__canvases || this.canvases;
+
+                        canvas && canvas.calcOffset && canvas.calcOffset();
+
+                        if (canvases && canvases.length) {
+                            for (var i = 0, len = canvases.length; i < len; i++) {
+                                canvases[i].calcOffset();
+                            }
+                        }
+                    });
+                })();
+
+                function openContext(x) {
+                    $('.editor-menu-context').slideUp("fast");
+                    if($(x).is(":hidden")) {
+                    $(x).slideDown("fast");
+                    }
+                };
+                function openChat(x) {
+                    if($(x).is(":hidden")) {
+                        $(x).slideDown("fast");
+                    } else {
+                        $(x).slideUp("fast");
+                    }
+                };
+            </script>
+            <div class="editor-menu">
+
+            <section ng-if="project.user._id == authentication.user._id ||  type == 'file'">
+                <span class="glyphicon glyphicon-plus" onclick="openContext('#context-plus')"></span>
+                <div class="editor-menu-context" id="context-plus" style="width:200px;">
+                    <button type="button" class="btn-editor rect" ng-click="addRect()">Квадрат</button>
+                    <button type="button" class="btn-editor circle" ng-click="addCircle()">Кръг</button>
+                    <button type="button" class="btn-editor triangle" ng-click="addTriangle()">Триъгълник</button>
+                    <button type="button" class="btn-editor line" ng-click="addLine()">Права</button>
+                    <button type="button" class="btn-editor polygon" ng-click="addPolygon()">Полигон</button>
+                    <button tyoe="button" class="btn-editor" ng-click="addText()">Tекст</button>
+                    <button type="button" class="btn-editor" data-toggle="modal" data-target="#upload-file-cloud-modal">Картинка от облак</button>
+                    <button type="button" class="btn-editor" data-toggle="modal" data-target="#upload-file-project-cloud-modal" ng-if="type == 'project'">Картинка от проект</button>
+                </div>
+            </section>
+
+            <section ng-if="project.user._id == authentication.user._id ||  type == 'file'">
+                <span class="glyphicon glyphicon-pencil" onclick="openContext('#context-draw')"></span>
+                <div class="editor-menu-context" id="context-draw">
+                    <div id="drawing-mode-wrapper">
+                        <div id="drawing-mode-options">
+                            <label for="drawing-mode-selector">Четка:</label>
+                            <select id="drawing-mode-selector" bind-value-to="drawingMode">
+                                <option value="Pencil">Молив</option>
+                                <option value="Circle">Кръг</option>
+                                <option value="Spray">Спрей</option>
+                                <option value="Pattern">Кръгове</option>
+
+                                <option value="hline">Вертикални линии</option>
+                                <option value="vline">Хоризонтални линии</option>
+                                <option value="square">Решетка</option>
+                                <option value="diamond">Диамант</option>
+                            </select>
+                            <div style="width:100%;height:1px;background:#CCC;margin:10px 0;"></div>
+                            <label for="drawing-line-width">Дебелина:</label>
+                            <input type="range" value="30" min="0" max="150" id="drawing-line-width" bind-value-to="drawingLineWidth">
+                            <div style="width:100%;height:1px;background:#CCC;margin:10px 0;"></div>
+                            <label for="drawing-color">Цвят:</label>
+                            <input type="color" value="#005E7A" id="drawing-color" bind-value-to="drawingLineColor">
+                            <div style="width:100%;height:1px;background:#CCC;margin:10px 0;"></div>
+                        </div>
+                    </div>
+                    <button id="drawing-mode" class="btn-editor ng-binding" ng-click="setFreeDrawingMode(!getFreeDrawingMode())" ng-class="{&#39;btn-inverse&#39;: getFreeDrawingMode()}">Рисуване</button>
+                </div>
+            </section>
+
+            <section ng-if="project.user._id == authentication.user._id ||  type == 'file'">
+                <span class="glyphicon glyphicon-asterisk" ng-show="canvas.getActiveObject()" onclick="openContext('#context-оptions')"></span>
+                <div class="editor-menu-context" id="context-оptions">
+
+                    <div id="color-opacity-controls" ng-show="canvas.getActiveObject()" class="ng-hide">
+                        <label for="opacity">Прозрачност: </label>
+                        <input value="100" type="range" id="opacity" bind-value-to="opacity">
+                        <div style="width:100%;height:1px;background:#CCC;margin:10px 0;"></div>
+                        <div ng-hide="getLine()">
+                        <label for="color">Цвят: </label>
+                        <input type="color" id="color" style="width:40px" bind-value-to="fill">
+                        </div>
+                        <div ng-show="getLine()">
+                        <label for="color">Цвят: </label>
+                        <input type="color" id="color" style="width:40px" bind-value-to="strokeColor">
+                        </div>
+                        <div style="width:100%;height:1px;background:#CCC;margin:10px 0;"></div>
+                    </div>
+
+                    <div ng-show="canvas.getActiveObject()">
+                        <button id="gradientify" class="btn-editor btn-object-action" ng-click="gradientify()">Градиент</button>
+                        <button id="shadowify" class="btn-editor btn-object-action" ng-click="shadowify()">Сянка</button>
+                        <!-- <button id="clip" class="btn btn-object-action" ng-click="clip()">Отрежи</button> -->
+                        <button class="btn-editor btn-object-action ng-binding" ng-click="setHorizontalLock(!getHorizontalLock())" ng-class="{&#39;btn-inverse&#39;: getHorizontalLock()}">X движение</button>
+                        <button class="btn-editor btn-object-action ng-binding" ng-click="setVerticalLock(!getVerticalLock())" ng-class="{&#39;btn-inverse&#39;: getVerticalLock()}">Y движение</button>
+                        <button class="btn-editor btn-object-action ng-binding" ng-click="setScaleLockX(!getScaleLockX())" ng-class="{&#39;btn-inverse&#39;: getScaleLockX()}">X скалиране</button>
+                        <button class="btn-editor btn-object-action ng-binding" ng-click="setScaleLockY(!getScaleLockY())" ng-class="{&#39;btn-inverse&#39;: getScaleLockY()}">Y скалиране</button>
+                        <button class="btn-editor btn-object-action ng-binding" ng-click="setRotationLock(!getRotationLock())" ng-class="{&#39;btn-inverse&#39;: getRotationLock()}">Заключи завъртане</button>
+                        <button id="send-backwards" class="btn-editor btn-object-action" ng-click="sendBackwards()">Назад</button>
+                        <!-- <button id="send-to-back" class="btn-editor btn-object-action" ng-click="sendToBack()">Най-отзад</button> -->
+                        <button id="bring-forward" class="btn-editor btn-object-action" ng-click="bringForward()">Напред</button>
+                        <button id="bring-to-front" class="btn-editor btn-object-action" ng-click="bringToFront()">В началото</button>
+                        <button class="btn-editor btn-object-action" id="remove-selected" ng-click="removeSelected()">Изтрий</button>
+                    </div>
+                    
+                    <div ng-hide="canvas.getActiveObject()">
+                        <span style="font-size:14px;">Не е избран елемент</span>
+                    </div>
+                </div>
+            </section>
+
+            <section ng-if="project.user._id == authentication.user._id ||  type == 'file'">
+                <span class="glyphicon glyphicon-font" ng-show="getText()" onclick="openContext('#context-text')"></span>
+                <div class="editor-menu-context" id="context-text">
+                    <div id="text-wrapper" style="margin-top: 10px" ng-show="getText()" class="ng-hide">
+                        <label for="text-area" style="display:inline-block">Текст:</label>
+                        <textarea id="text-area" bind-value-to="text" style="resize: none;width:200px;margin-right:18px;"></textarea>
+                        <div style="width:100%;height:1px;background:#CCC;margin:10px 0;"></div>
+                        <label for="font-family" style="display:inline-block">Фонт:</label>
+                        <select id="font-family" class="btn-object-action" bind-value-to="fontFamily">
+                            <option value="arial">Arial</option>
+                            <option value="helvetica" selected="">Helvetica</option>
+                            <option value="myriad pro">Myriad Pro</option>
+                            <option value="delicious">Delicious</option>
+                            <option value="verdana">Verdana</option>
+                            <option value="georgia">Georgia</option>
+                            <option value="courier">Courier</option>
+                            <option value="comic sans ms">Comic Sans MS</option>
+                            <option value="impact">Impact</option>
+                            <option value="monaco">Monaco</option>
+                            <option value="optima">Optima</option>
+                            <option value="hoefler text">Hoefler Text</option>
+                            <option value="plaster">Plaster</option>
+                            <option value="engagement">Engagement</option>
+                        </select>
+                        <div style="width:100%;height:1px;background:#CCC;margin:10px 0;"></div>
+                        <label for="text-align" style="display:inline-block">Позиция:</label>
+                        <select id="text-align" class="btn-object-action" bind-value-to="textAlign">
+                            <option value="Left">Ляво</option>
+                            <option value="Center">Централно</option>
+                            <option value="Right">Дясно</option>
+                            <!-- <option value="Justify">Justify</option> -->
+                        </select>
+                        <div style="width:100%;height:1px;background:#CCC;margin:10px 0;"></div>
+                        <label for="color">Цвят шрифт: </label>
+                        <input type="color" id="color" style="width:40px" bind-value-to="fill">
+                        <div style="width:100%;height:1px;background:#CCC;margin:10px 0;"></div>
+                        <label for="text-lines-bg-color">Цват фон:</label>
+                        <input type="color" value="" id="text-lines-bg-color" size="10" class="btn-object-action" bind-value-to="textBgColor">
+                        <div style="width:100%;height:1px;background:#CCC;margin:10px 0;"></div>
+                        <label for="text-stroke-color">Цвят ръб:</label>
+                        <input type="color" value="" id="text-stroke-color" class="btn-object-action" bind-value-to="strokeColor">
+                        <div style="width:100%;height:1px;background:#CCC;margin:10px 0;"></div>
+                        <label for="text-stroke-width">Дебелина ръб:</label>
+                        <input type="range" value="1" min="1" max="5" id="text-stroke-width" class="btn-object-action" bind-value-to="strokeWidth">
+                        <div style="width:100%;height:1px;background:#CCC;margin:10px 0;"></div>
+                        <label for="text-font-size">Размер на символ:</label>
+                        <input type="range" value="" min="1" max="120" step="1" id="text-font-size" class="btn-object-action" bind-value-to="fontSize">
+                        <div style="width:100%;height:1px;background:#CCC;margin:10px 0;"></div>
+                        <label for="text-line-height">Размер на ред:</label>
+                        <input type="range" value="" min="0" max="10" step="0.1" id="text-line-height" class="btn-object-action" bind-value-to="lineHeight">
+                        <div style="width:100%;height:1px;background:#CCC;margin:10px 0 0 0;"></div>
+                        <button type="button" class="btn-editor btn-object-action" ng-click="toggleBold()" ng-class="{&#39;btn-inverse&#39;: isBold()}">Bold</button>
+                        <button type="button" class="btn-editor btn-object-action" id="text-cmd-italic" ng-click="toggleItalic()" ng-class="{&#39;btn-inverse&#39;: isItalic()}">Italic</button>
+                        <button type="button" class="btn-editor btn-object-action" id="text-cmd-underline" ng-click="toggleUnderline()" ng-class="{&#39;btn-inverse&#39;: isUnderline()}">Underline</button>
+                        <button type="button" class="btn-editor btn-object-action" id="text-cmd-linethrough" ng-click="toggleLinethrough()" ng-class="{&#39;btn-inverse&#39;: isLinethrough()}">Linethrough</button>
+                        <button type="button" class="btn-editor btn-object-action" id="text-cmd-overline" ng-click="toggleOverline()" ng-class="{&#39;btn-inverse&#39;: isOverline()}">Overline</button>
+                    </div>
+                </div>
+            </section>
+
+            <section ng-if="project.user._id == authentication.user._id ||  type == 'file'">
+                <span class="glyphicon glyphicon-cog" onclick="openContext('#context-settings')"></span>
+                <div class="editor-menu-context" id="context-settings">
+                    <!-- <label for="canvas-background-picker">Цвят на фона:</label>
+                    <input type="color" id="canvas-background-picker" bind-value-to="canvasBgColor"> -->
+
+                    <button class="btn-editor" ng-click="confirmClear()">Изчисти листа</button>
+                </div>
+            </section>
+
+            <section ng-if="project.user._id == authentication.user._id ||  type == 'file'">
+                <span class="glyphicon glyphicon-floppy-disk" ng-click="rasterize()"></span>
+                <!-- <div class="editor-menu-context" id="context-save">
+                    <div id="global-controls">
+                        <button class="btn-editor" id="rasterize" ng-click="rasterize()">Картинка</button>
+                        <button class="btn-editor" id="rasterize-svg" ng-click="rasterizeSVG()">SVG</button>
+                        <button class="btn-editor" id="rasterize-json" ng-click="rasterizeJSON()">JSON</button>
+                    </div>
+                </div> -->
+            </section>
+
+            <script>
+                $(document).ready(function() {
+                    var socket = io.connect();
+                    var Live = function(socket) {
+                        this.socket = socket;
+                    };
+
+                    Live.prototype.sendMessage = function(user, userId, group, text) {
+                        var message = {
+                            user: user,
+                            userId: userId,
+                            group: group,
+                            text: text
+                        };
+                        this.socket.emit('message', message);
+                    };
+
+                    Live.prototype.changeGroup = function(group) {
+                        this.socket.emit('join', {
+                            group: group
+                        });
+                    };
+
+                    Live.prototype.sendChanges = function(user, group, data) {
+                        var changes = {
+                            user: user,
+                            group: group,
+                            data: data
+                        };
+                        this.socket.emit('changes', changes);
+                    };
+
+                    var liveApp = new Live(socket);
+                    setTimeout(function(){
+                        liveApp.changeGroup($('#group-id').val());
+
+                        socket.on('message', function (message) {
+                            var newElement = $('<div></div>').text(message.text);
+                            $('#editor-page-chat-messages').append(newElement);
+                        });
+
+                        $('#chat-form').submit(function() {
+                            var group = $('#group-id').val(); 
+                            processUserInput(group, liveApp, socket);
+                            return false;
+                        });
+
+                        socket.on('changes', function (changes) {
+                           canvas.clear();
+                           canvas.loadFromJSON(JSON.parse(changes.data));
+                        });
+
+
+                        $('.upper-canvas').click(function(){
+                            if($('#project-user').val() == $('#your-user').val()){
+                                var user = $('#your-user').val(),
+                                    group = $('#group-id').val();
+                                    data = JSON.stringify(canvas);
+                                liveApp.sendChanges(user, group, data);
+                            }
+                        })
+
+                        function divEscapedContentElement(user, message) {
+                            return $('<div></div>').text(user+": "+message);
+                        }
+
+                        function processUserInput(group, liveApp, socket) {
+                            var message = $('#message-input').val(),
+                                user = $('#your-displayName').val(),
+                                userId = $('#your-user').val();
+                            liveApp.sendMessage(user, userId, group, message);
+                            $('#editor-page-chat-messages').append(divEscapedContentElement(user, message));
+                            $('#editor-page-chat-messages').scrollTop($('#editor-page-chat-messages').prop('scrollHeight'));
+                            $('#message-input').val('');
+                        }
+                    }, 500);
+
+                });
+            </script>
+
+            <section ng-if="type == 'project'">
+                <span class="glyphicon glyphicon-envelope" onclick="openChat('#context-chat')"></span>
+                <div class="editor-chat" id="context-chat">
+                    <div class="editor-page-chat-messages" id="editor-page-chat-messages">
+                        <div data-ng-repeat="msg in messages">
+                            {{ msg.user }}: {{ msg.content }}
+                        </div>
+                    </div>
+                    <div class="editor-page-chat-form">
+                        <form id='chat-form' data-id="{{ file._id }}">
+                            <input type="hidden" id="group-id" value="{{ file._id }}">
+                            <input type="hidden" id="project-id" value="{{ project._id }}">
+                            <input type="hidden" id="project-user" value="{{ project.user._id }}">
+                            <input type="hidden" id="your-user" value="{{ authentication.user._id }}">
+                            <input type="hidden" id="your-displayName" value="{{ authentication.user.displayName }}">
+                            <input type="text" id="message-input" data-id="{{ authentication.user._id }}" data-name="{{ authentication.user.displayName }}" placeholder="Съобщение...">
+                            <input type="submit" id="message-button" class="btn btn-primary btn-sm btn-send-msg" value="Изпрати">
+                        </form>
+                    </div>
+                </div>
+            </section>
+            </div>
+        </div>
+
+        <!-- Upload file form the Cloud -->
+        <div class="modal" id="upload-file-cloud-modal" role="dialog" aria-labelledby="Upload file form the Cloud" aria-describedby="Uploading file form the Cloud" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <section data-ng-controller="CanvasControls" ng-init="initStorage();">
+                        <form data-ng-submit="addFileCloud()">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                <h4 class="modal-title">Добавяне на файл от облака</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="storage-explorer">
+                                    <div class="storage-explorer-head">
+                                        <div class="storage-explorer-col col-name">Име</div>
+                                        <div class="storage-explorer-col col-type">Тип</div>
+                                        <div class="storage-explorer-col col-size">Размер</div>
+                                    </div>
+                                    <div class="storage-explorer-body">
+                                        <div class="storage-explorer-row" ng-click="back()" data-ng-hide="path.length === 0">
+                                            <div class="storage-explorer-col col-name">...</div>
+                                        </div>
+                                        <div class="storage-explorer-row" data-ng-repeat="file in storage | orderBy: sortFilesBy" ng-click="changeSelected(); openCloudFolder()" ng-class="{active: '{{ file._id }}' == selected }" id="storage-file-cloud-{{ file._id }}" data-name="{{ file.name }}" data-real-name="{{ file.realName }}">
+                                            <div class="storage-explorer-col col-name">{{ file.name }}</div>
+                                            <div class="storage-explorer-col col-type">{{ file.fileType }}</div>
+                                            <div class="storage-explorer-col col-size">
+                                                <span ng-switch="file.size > 1024*1024" ng-if="file.type != 1">
+                                                    <span ng-switch-when="true">{{file.size / 1024 / 1024 | number:2}} MB</span>
+                                                    <span ng-switch-default>{{file.size / 1024 | number:2}} kB</span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Отказ</button>
+                                <input type="submit" class="btn btn-primary" value="Добави">
+                            </div>
+                        </form>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload file form the Project Cloud -->
+        <div class="modal" id="upload-file-project-cloud-modal" role="dialog" aria-labelledby="Upload file form the Project Cloud" aria-describedby="Uploading file form the Project Cloud" aria-hidden="true" ng-if="type == 'project'">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <section data-ng-controller="CanvasControls" ng-init="initProjectStorage();">
+                        <form data-ng-submit="addFileProjectCloud()">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                <h4 class="modal-title">Добавяне на файл от облака</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="storage-explorer">
+                                    <div class="storage-explorer-head">
+                                        <div class="storage-explorer-col col-name">Име</div>
+                                        <div class="storage-explorer-col col-type">Тип</div>
+                                        <div class="storage-explorer-col col-size">Размер</div>
+                                    </div>
+                                    <div class="storage-explorer-body">
+                                        <div class="storage-explorer-row" ng-click="projectBack()" data-ng-hide="path.length === 0">
+                                            <div class="storage-explorer-col col-name">...</div>
+                                        </div>
+                                        <div class="storage-explorer-row" data-ng-repeat="file in storageProject | orderBy: sortFilesBy" ng-click="changeProjectSelected(); openProjectCloudFolder()" ng-class="{active: '{{ file._id }}' == projectSelected }" id="storage-file-project-cloud-{{ file._id }}" data-name="{{ file.name }}" data-real-name="{{ file.realName }}">
+                                            <div class="storage-explorer-col col-name">{{ file.name }}</div>
+                                            <div class="storage-explorer-col col-type">{{ file.fileType }}</div>
+                                            <div class="storage-explorer-col col-size">
+                                                <span ng-switch="file.size > 1024*1024" ng-if="file.type != 1">
+                                                    <span ng-switch-when="true">{{file.size / 1024 / 1024 | number:2}} MB</span>
+                                                    <span ng-switch-default>{{file.size / 1024 | number:2}} kB</span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Отказ</button>
+                                <input type="submit" class="btn btn-primary" value="Добави">
+                            </div>
+                        </form>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

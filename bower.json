@@ -1,0 +1,19 @@
+{
+  "name": "ArchTech",
+  "version": "0.2.0",
+  "description": "Real-time Image Editor",
+  "dependencies": {
+    "bootstrap": "~3",
+    "angular": "~1.2",
+    "angular-cookies": "~1.2",
+    "angular-resource": "~1.2",
+    "angular-animate": "~1.2",
+    "angular-mocks": "~1.2",
+    "angular-bootstrap": "~0.10.0",
+    "angular-ui-utils": "~0.1.1",
+    "angular-ui-router": "~0.2.10",
+    "jquery-ui": "~1.10.4",
+    "angular-webstorage": "~0.10.3",
+    "jquery-mousewheel": "~3.1.11"
+  }
+}

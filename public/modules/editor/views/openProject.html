@@ -1,0 +1,72 @@
+<section class="container" data-ng-controller="EditorController" data-ng-init="openProject()">
+    <div class="col-md-3">
+        <div class="panel  panel-default">
+            <div class="panel-heading">
+                Отворени файлове
+            </div>
+            <div class="panel-body">
+                <div ng-repeat="file in openedFiles">
+                    <a href="#!/editor/project/{{ file.fromId }}/file/{{ file.id }}" ng-if="file.fromName == project.title">{{file.fromName}} / {{ file.name }}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div class="row">
+            <div class="navbar navbar-default">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-inverse-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="navbar-collapse collapse navbar-inverse-collapse">
+                    <ul class="nav navbar-nav">
+                        <li>
+                            <a href="" ng-click="openFile()">Отвори</a>
+                        </li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="" class="dropdown-toggle" data-toggle="dropdown">Групирай <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="" ng-click="sortFilesBy = 'type'">Нормално</a></li>
+                                <li><a href="" ng-click="sortFilesBy = 'name'">Име</a></li>
+                                <li><a href="" ng-click="sortFilesBy = '-fileType'">Тип</a></li>
+                                <li><a href="" ng-click="sortFilesBy = 'data'">Дата</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="storage-explorer">
+                <div class="storage-explorer-head">
+                    <div class="storage-explorer-col col-name">Име</div>
+                    <div class="storage-explorer-col col-type">Тип</div>
+                    <div class="storage-explorer-col col-size">Размер</div>
+                    <div class="storage-explorer-col col-data">Дата</div>
+                </div>
+                <div class="storage-explorer-body">
+                    <div class="storage-explorer-row" ng-click="storageBack()" data-ng-hide="path.length === 0">
+                        <div class="storage-explorer-col col-name">...</div>
+                    </div>
+                    <div class="storage-explorer-row" data-ng-repeat="file in storage | orderBy: sortFilesBy" ng-click="storageChangeSelected()" ng-dblclick="openFile()" ng-class="{active: '{{ file._id }}' == selected }" id="storage-file-{{ file._id }}" data-name="{{ file.name }}" data-project="{{ project.title }}" data-projectid="{{ project._id }}" data-type="{{ file.type }}">
+                        <div class="storage-explorer-col col-name">{{ file.name }}</div>
+                        <div class="storage-explorer-col col-type">{{ file.fileType }}</div>
+                        <div class="storage-explorer-col col-size">
+                            <span ng-switch="file.size > 1024*1024" ng-if="file.type != 1">
+                                <span ng-switch-when="true">{{file.size / 1024 / 1024 | number:2}} MB</span>
+                                <span ng-switch-default>{{file.size / 1024 | number:2}} kB</span>
+                            </span>
+                        </div>
+                        <div class="storage-explorer-col col-data">{{ file.created | date: 'dd.MM.yyyy' }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="alert alert-warning text-center" style="margin-top: 20px;" data-ng-hide="!storage || storage.length">
+                Няма файлове в тази папка.
+            </div>
+        </div>
+    </div>
+</section>

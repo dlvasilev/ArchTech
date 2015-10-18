@@ -1,0 +1,21 @@
+<section data-ng-controller="ProjectsController" data-ng-init="find()">
+    <div class="row">
+        <a data-ng-repeat="project in projects" data-ng-href="#!/projects/{{project._id}}">
+            <div class="col-md-3">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{project.title}}</h3>
+                    </div>
+                    <div class="panel-body">{{project.content}}</div>
+                    <div class="panel-footer">Създаден на {{project.created | date:'dd.MM.yyyy'}}</div>
+                </div>
+            </div>
+        </a>
+        <div class="col-md-3"><a href="/#!/projects/create" class="btn btn-primary">Нов проект</a></div>
+    </div>
+    <div class="container">
+        <div class="col-md-12">
+            <div class="alert alert-warning text-center empty-section" data-ng-hide="!projects || projects.length">Не участвате в проекти</div>
+        </div>
+    </div>
+</section>

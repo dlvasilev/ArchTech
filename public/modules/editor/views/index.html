@@ -1,0 +1,30 @@
+<section class="container" data-ng-controller="EditorController" data-ng-init="home()">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="panel  panel-default">
+                <div class="panel-heading">
+                    Проекти
+                </div>
+                <div class="panel-body">
+                     <div class="editor-project" ng-repeat="project in projects">{{ project.title }}
+                         <span class="badge" ng-show="project.live === true"><a href="#!/editor/project/{{project._id}}" style="color: #FFF;">Участвай</a></span>
+                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="panel  panel-default">
+                <div class="panel-heading">
+                    Отворени файлове
+                </div>
+                <div class="panel-body">
+                    <div ng-repeat="file in openedFiles" class="editor-file">
+                        <a href="#!/editor/file/{{ file.id }}" ng-if="file.type == 1">{{ file.name }}</a>
+                        <a href="#!/editor/project/{{ file.fromId }}/file/{{ file.id }}" ng-if="file.type == 2">{{file.fromName}} / {{ file.name }}</a>
+                        <span ng-click="closeFile(file.id)" class="close-file">Затвори</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
